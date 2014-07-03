@@ -12,6 +12,7 @@ struct w_device{
     
     string host;
     string name;
+    int index;
     float delta;
     
 };
@@ -44,6 +45,9 @@ class testApp : public ofBaseApp {
         bool isFileWritten;
     
         int keyEnterMode;
+        int deviceIncr;
+    
+        w_device selDev;
     
         map<string, w_device> m_devices;
 
@@ -53,8 +57,6 @@ class testApp : public ofBaseApp {
     
         string fileName, m_dirName;
         ofDirectory m_dir;
-        
-    
 
         ofxOscSender sender;
         
