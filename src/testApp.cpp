@@ -16,9 +16,10 @@ void testApp::setup(){
     
     //could add code to make directory here
     
-    fileName = "wekiSession_" + ofToString(ofGetUnixTime(),0) + "_";
+    m_dirName = ofGetTimestampString();
+    m_dir.createDirectory(m_dirName);
+    fileName = ofGetTimestampString() + "_";
     fIndex = 0;
-    jsonObj.save(fileName + ofToString(fIndex, 0) + ".json" , true);
     isFileWritten = true;
     
     
@@ -33,10 +34,10 @@ void testApp::resetSenders(){
 //--------------------------------------------------------------
 void testApp::update(){
     
-    if(ofGetSeconds()%300 == 0){
+    if(ofGetSeconds()%30 == 0){
         if(!isFileWritten){
             fIndex += 1;
-            jsonObj.save(fileName + ofToString(fIndex, 0) + ".json" , true);
+            jsonObj.save(m_dirName + "/" + fileName + ofToString(fIndex, 0) + ".json" , true);
             jsonObj.clear();
             cout << "writeFile" << endl;
             isFileWritten = true;
@@ -86,20 +87,24 @@ void testApp::update(){
         current_msg_string = (current_msg_string + 1) % NUM_MSG_STRINGS;
         // clear the next line
         msg_strings[current_msg_string] = "";
+        
+        vector<string> messObj;
+        messObj.push_back(msg_string);
+        messObj.push_back(ofToString(ofGetSystemTimeMicros()));
 
         if(m_devices.find(m.getRemoteIp()) != m_devices.end()){
             w_device td = m_devices[m.getRemoteIp()];
-            
-            jsonObj[td.host][td.name]["messages"].append(msg_string);
-            jsonObj[td.host][td.name]["timestamps"].append(ofGetUnixTime());
+        
+            jsonObj[td.host]["messages"][ofGetTimestampString()].append(msg_string);
+           
         }else{
             w_device td;
             td.host = m.getRemoteIp();
             td.delta = ofGetElapsedTimef() - m.getArgAsFloat(1);
             m_devices[td.host] = td;
             
-            jsonObj[td.host]["messages"].append(msg_string);
-            jsonObj[td.host]["timestamps"].append(ofGetSystemTimeMicros());
+            jsonObj[td.host]["messages"][ofGetTimestampString()].append(msg_string);
+         
         }
         
         sender.sendMessage(m);
@@ -246,6 +251,6 @@ void testApp::dragEvent(ofDragInfo dragInfo){
 void testApp::exit(){
     
     fIndex += 1;
-    jsonObj.save(fileName + ofToString(fIndex, 0) + ".json" , true);
+    jsonObj.save(m_dirName + "/" + fileName + ofToString(fIndex, 0) + ".json" , true);
 
 }
