@@ -58,24 +58,30 @@ void testApp::update(){
 	while(receiver.hasWaitingMessages()){
 		// get the next message
 		ofxOscMessage m;
+        ofxOscMessage om;
     
 		receiver.getNextMessage(&m);
         
         vector<string> args;
         
         string msg_string;
+        om.setAddress(m.getAddress());
         msg_string = m.getAddress();
+        if(m_devices.find(m.getRemoteIp()) != m_devices.end())om.addIntArg(m_devices[m.getRemoteIp()].index);
         msg_string += ": ";
         for(int i = 0; i < m.getNumArgs(); i++){
 
             // display the argument - make sure we get the right type
             if(m.getArgType(i) == OFXOSC_TYPE_INT32){
+                om.addIntArg(m.getArgAsInt32(i));
                 msg_string += ofToString(m.getArgAsInt32(i));
             }
             else if(m.getArgType(i) == OFXOSC_TYPE_FLOAT){
+                om.addIntArg(m.getArgAsFloat(i));
                 msg_string += ofToString(m.getArgAsFloat(i));
             }
             else if(m.getArgType(i) == OFXOSC_TYPE_STRING){
+                om.addStringArg(m.getArgAsString(i));
                 msg_string += m.getArgAsString(i);
             }
             
@@ -109,7 +115,7 @@ void testApp::update(){
          
         }
         
-        sender.sendMessage(m);
+        sender.sendMessage(om);
 
 	}
 }
